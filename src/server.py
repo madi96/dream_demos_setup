@@ -16,7 +16,7 @@ class Interface():
     callbacks=[]
 
     def register(self, callback):
-        print 'registering a callback'
+        #rospy.loginfo('registering a callback')
         self.callbacks.append(callback)
         
     def unregister(self, callback):
@@ -24,7 +24,7 @@ class Interface():
 
     def notifyInterface(self, msgToInterface):
         for callback in self.callbacks:
-            print 'msgToInterface',msgToInterface
+            rospy.loginfo('Message sent to Interface')
             callback(msgToInterface)
     
 
@@ -39,16 +39,16 @@ class MainHandler(tornado.web.RequestHandler):
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
-        print "New client !"
+        rospy.loginfo("New client !")
         self.application.interface.register(self.upadateInterfaceCallback)
         pass
   
     def on_message(self, message):
         self.write_message(u"Your message was: " + message)
-        print message
+        rospy.loginfo(message)
   
     def on_close(self):
-        print "Goodbye, see you later !"
+        rospy.loginfo( "Goodbye, connection closed !")
         self.application.interface.unregister(self.upadateInterfaceCallback)
         pass
     
@@ -104,6 +104,6 @@ if __name__ == "__main__":
     serverThread.start()
     #tornado.ioloop.IOLoop.current().start()
     server_node = ServerNode(app)
-    print "Server Launched on localhost:8888"
+    rospy.loginfo("Server Launched on localhost:8888")
     server_node.server()
     #threading.Thread(target=server_node.server).start()
