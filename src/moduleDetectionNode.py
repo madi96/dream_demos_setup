@@ -6,7 +6,7 @@
 # Description  : This node is used to detect modules(Lever, joystick, button) on an interface, 
 #               in order to provide a robot a feedback about what he interacted with during 
 #               an experiment. 
-
+import sys
 import freenect
 import cv2
 import numpy as np
@@ -36,18 +36,26 @@ class ModuleDetection():
 		#threshInterface2 = threshInterface.copy()
 
 		# Find modules in the filtered image
-		_,contours,_ = cv2.findContours(threshInterface, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+		contours,_ = cv2.findContours(threshInterface, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
 		# For each contour id the module depending on its relative position to the center of the interface
 		maxArea = 0
 		best_fit = None
+		if(len(contours) == 0) :
+			print("no contour detected")
+			sys.exit(1)
+
 		for cnt in contours:
 			area = cv2.contourArea(cnt)
 			if area > maxArea:
 				maxArea = area
 				best_fit = cnt
 
+		if(not best_fit) :
+			print("no best fit contour")
+			sys.exit(1)
 		# Return coordinates and dimentions of the detected module
+
 		moduleCoodDim = cv2.boundingRect(best_fit)
 			# epsilon = 0.1*cv2.arcLength(best_fit,True)
 			# approx = cv2.approxPolyDP(best_fit,epsilon,True)
@@ -202,7 +210,7 @@ class ModuleDetection():
 			thresh2 = thresh.copy()
 
 			# Find contours in the filtered image
-			_,contours,_ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+			contours,_ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
 			# Test for the contour with maximum area and store it as best fit for the interface
 			max_area = 0
