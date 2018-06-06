@@ -17,13 +17,13 @@ from dream_demos_setup.msg import Joystick, State
 
 class ModuleDetection(): 
 		
-#	def isset(self,v): 
-#		try: 
-#			type (eval(v)) 
-#		except: 
-#			return 0 
-#		else: 
-#			return 1
+	def isset(self,v): 
+		try: 
+			type (eval(v)) 
+		except: 
+			return 0 
+		else: 
+			return 1
 
 	def getKinectVideoFeed(self):
 		array,_ = freenect.sync_get_video()
@@ -216,8 +216,9 @@ class ModuleDetection():
 			cx, cy = 0,0    # coordinates of the center of the detected interface
 			x, y = 0,0      # coordinates of the detected interface
 			h,w = 0,0       # height and width of the detected interface
-			M = cv2.moments(best_fit)
-			x,y,w,h = cv2.boundingRect(best_fit)
+			if isset('best_fit'):
+				M = cv2.moments(best_fit)
+				x,y,w,h = cv2.boundingRect(best_fit)
 			if w == 0:
 				rospy.loginfo("WARNING: The Best fit for the Interface is no longer detected :( ...")
 			else:
