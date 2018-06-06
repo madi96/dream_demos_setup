@@ -1,8 +1,8 @@
 /* 
 Author       : Yaakoubi Oussama
 Organism     : Amac-Isir (In the scoop of the Dream project)
-Description  : This node synchonises data from multiple buttons and then 
-               updates the interface and controls the box Module  
+Description  : This node synchonises data retrived from multiple buttons
+               and then updates the interface and controls the box Module  
 */
 
 
