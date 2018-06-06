@@ -137,7 +137,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(button_module_node src/button_module_node.cpp)
-
+add_executable(joystick_module_node src/joystick_module_node.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -150,6 +150,9 @@ add_executable(button_module_node src/button_module_node.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(button_module_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(joystick_module_node
   ${catkin_LIBRARIES}
 )
 
