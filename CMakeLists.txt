@@ -139,6 +139,7 @@ include_directories(
 add_executable(button_module_node src/button_module_node.cpp)
 add_executable(joystick_module_node src/joystick_module_node.cpp)
 add_executable(thymio_button_module_node src/thymio_button_module_node.cpp)
+add_executable(box_button_module_node src/box_button_module_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -160,7 +161,9 @@ target_link_libraries(joystick_module_node
 target_link_libraries(thymio_button_module_node
   ${catkin_LIBRARIES}
 )
-
+target_link_libraries(box_button_module_node
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############
