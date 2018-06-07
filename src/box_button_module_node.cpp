@@ -6,6 +6,7 @@ Description  : This node is used to start/stop the thymio on buttonActivation
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 
 #include <dream_demos_setup/StampedBool.h>
 
