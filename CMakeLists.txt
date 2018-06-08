@@ -164,7 +164,6 @@ target_link_libraries(thymio_button_module_node
 target_link_libraries(box_button_module_node
   ${catkin_LIBRARIES}
 )
-=======
 
 #############
 ## Install ##
