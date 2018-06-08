@@ -158,7 +158,6 @@ target_link_libraries(button_module_node
 target_link_libraries(joystick_module_node
   ${catkin_LIBRARIES}
 )
-<<<<<<< HEAD
 target_link_libraries(thymio_button_module_node
   ${catkin_LIBRARIES}
 )
@@ -167,7 +166,6 @@ target_link_libraries(box_button_module_node
 )
 =======
 
->>>>>>> d13a0827ed2655134f981d9ddde05ed3393cc7a4
 #############
 ## Install ##
 #############
