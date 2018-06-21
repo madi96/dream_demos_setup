@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(dream_demos_setup)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -54,6 +54,7 @@ add_message_files(
    Joystick.msg
    State.msg
    StampedBool.msg
+   RoboboPose.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -120,7 +121,7 @@ CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-  ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -140,6 +141,7 @@ add_executable(button_module_node src/button_module_node.cpp)
 add_executable(joystick_module_node src/joystick_module_node.cpp)
 add_executable(thymio_button_module_node src/thymio_button_module_node.cpp)
 add_executable(box_button_module_node src/box_button_module_node.cpp)
+add_executable(optitrack_node src/optitrack_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -158,16 +160,15 @@ target_link_libraries(button_module_node
 target_link_libraries(joystick_module_node
   ${catkin_LIBRARIES}
 )
-<<<<<<< HEAD
 target_link_libraries(thymio_button_module_node
   ${catkin_LIBRARIES}
 )
 target_link_libraries(box_button_module_node
   ${catkin_LIBRARIES}
 )
-=======
-
->>>>>>> d13a0827ed2655134f981d9ddde05ed3393cc7a4
+target_link_libraries(optitrack_node
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############

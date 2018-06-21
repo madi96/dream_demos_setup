@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 # Author       : Yaakoubi Oussama
 # Organism     : Amac-Isir (In the scoop of the Dream project)
 # Description  : This node is used to detect modules(Lever, joystick, button) on an interface, 
