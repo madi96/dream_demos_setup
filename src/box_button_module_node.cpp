@@ -1,7 +1,7 @@
 /* 
 Author       : Yaakoubi Oussama
 Organism     : Amac-Isir (In the scoop of the Dream project)
-Description  : This node is used to start/stop the thymio on buttonActivation
+Description  : This node is used to open/close the box on buttonActivation
 */
 
 #include <ros/ros.h>
