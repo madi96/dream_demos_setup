@@ -13,7 +13,7 @@ Description  : This node is used to start/stop the thymio on buttonActivation
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PointStamped.h>
 #include <tf/transform_datatypes.h>
-
+#include <tf/transform_listener.h>
 #include <dream_demos_setup/RoboboPose.h>
 
 #include <math.h>
@@ -28,10 +28,11 @@ Description  : This node is used to start/stop the thymio on buttonActivation
 Eigen::MatrixXd gRotToRobotBase(3,3);
 Eigen::Vector3d gTransToRobotBase;
 
-Eigen::Vector3d gCanPos, gRoboboPos;
+Eigen::Vector3d gCanPos, gRoboboPos, gJoystickPos;
 
 ros::Publisher gRobobo_pos_quaternion_pub;
 ros::Publisher gCan_pos_pub;
+ros::Publisher gJoystick_pos_pub;
 ros::Publisher gRobobo_pose_xyyaw_pub;
 
 using namespace std;
@@ -176,6 +177,60 @@ void can_pose_callback(const geometry_msgs::PoseStamped::ConstPtr& can_pose)
     position.pose.position.z = gCanPos(2);
     gCan_pos_pub.publish(position);
 }
+// void toRobotFrame(const geometry_msgs::PoseStamped& optitrack_frame_pose, geometry_msgs::PoseStamped& robot_frame_pose){
+//     tf::TransformListener listener;
+//         ROS_INFO_STREAM("optitrack frame after transform x: "<<  optitrack_frame_pose.pose.position.x<<
+//         " y: "<<  optitrack_frame_pose.pose.position.y<<
+//         " z: "<<  optitrack_frame_pose.pose.position.z<< 
+//         "frame_id: "<<optitrack_frame_pose.header.frame_id);
+//     listener.transformPose("/base", optitrack_frame_pose, robot_frame_pose);
+//     ROS_INFO_STREAM("robot frame after transform x: "<<  robot_frame_pose.pose.position.x<<
+//         " y: "<<  robot_frame_pose.pose.position.y<<
+//         " z: "<<  robot_frame_pose.pose.position.z<<
+//         "frame_id: "<<robot_frame_pose.header.frame_id);
+
+// }
+void joystick_pose_callback(const geometry_msgs::PoseStamped::ConstPtr& joystick_pose)
+{
+
+    // geometry_msgs::PoseStamped joystick_pose_optitrack_frame;
+    // geometry_msgs::PoseStamped joystick_pose_robot_frame;   
+
+    // joystick_pose_optitrack_frame.header.frame_id = joystick_pose->header.frame_id;
+    // joystick_pose_optitrack_frame.header.stamp = joystick_pose->header.stamp;
+    // joystick_pose_optitrack_frame.pose.position.x = joystick_pose->pose.position.x;
+    // joystick_pose_optitrack_frame.pose.position.y = joystick_pose->pose.position.y;
+    // joystick_pose_optitrack_frame.pose.position.z = joystick_pose->pose.position.z;
+
+    // joystick_pose_optitrack_frame.pose.orientation.x = joystick_pose->pose.orientation.x;
+    // joystick_pose_optitrack_frame.pose.orientation.y = joystick_pose->pose.orientation.y;
+    // joystick_pose_optitrack_frame.pose.orientation.z = joystick_pose->pose.orientation.z;
+    // joystick_pose_optitrack_frame.pose.orientation.w = joystick_pose->pose.orientation.w;
+
+    // toRobotFrame(joystick_pose_optitrack_frame, joystick_pose_robot_frame);
+    // gJoystick_pos_pub.publish(joystick_pose_robot_frame);
+
+    Eigen::Vector3d joystick_position_optitrack;
+    // make sure that optitrack streaming setting: up axis Z axis
+
+    ROS_INFO_STREAM("befor transform x: "<<joystick_pose->pose.position.x<< 
+        " y: "<<joystick_pose->pose.position.y<< " z: "<<joystick_pose->pose.position.z<<
+         " frame_id: "<<joystick_pose->header.frame_id);
+    joystick_position_optitrack(0) = joystick_pose->pose.position.x;
+    joystick_position_optitrack(1) = joystick_pose->pose.position.y;
+    joystick_position_optitrack(2) = joystick_pose->pose.position.z;
+    transform_to_robotbase(joystick_position_optitrack, gJoystickPos);
+
+    geometry_msgs::PoseStamped position;
+    position.header.stamp    = ros::Time::now();
+    position.header.frame_id = "/base";
+    position.pose.position.x = gJoystickPos(0);
+    position.pose.position.y = gJoystickPos(1);
+    position.pose.position.z = gJoystickPos(2);
+    ROS_INFO_STREAM("after transform x: "<<position.pose.position.x<<" y: "<<position.pose.position.y<< " z: "<<position.pose.position.z<<
+         " frame_id: "<<position.header.frame_id);
+    gJoystick_pos_pub.publish(position);
+}
 
 
 
@@ -190,12 +245,13 @@ int main(int argc, char **argv)
   load_tf(tf_robotbase_file);
 
   ros::Subscriber robobo_position_sub     = n.subscribe("/optitrack/robobo/pose", 1000, robobo_pose_callback);
+  ros::Subscriber joystick_position_sub   = n.subscribe("/optitrack/joystick/pose", 1000, joystick_pose_callback);
   ros::Subscriber can_position_sub        = n.subscribe("/optitrack/can/pose", 1000, can_pose_callback);
 
-  // gJoystick_pos_pub                       = n.advertise<geometry_msgs::PoseStamped>(BAXTER_THROWING::topic_joystick_position, 1, true);
-  gRobobo_pos_quaternion_pub                         = n.advertise<geometry_msgs::PoseStamped>("/robot_frame_robobo_pose_quaternion", 1, true);
+  gJoystick_pos_pub                      = n.advertise<geometry_msgs::PoseStamped>("robot_frame_joystick_pose", 1, true);
+  gRobobo_pos_quaternion_pub             = n.advertise<geometry_msgs::PoseStamped>("/robot_frame_robobo_pose_quaternion", 1, true);
   gRobobo_pose_xyyaw_pub                 = n.advertise<dream_demos_setup::RoboboPose>("/robot_frame_robobo_x_y_yaw", 1, true);
-  gCan_pos_pub                            = n.advertise<geometry_msgs::PoseStamped>("/robot_frame_can_pose", 1, true);
+  gCan_pos_pub                           = n.advertise<geometry_msgs::PoseStamped>("/robot_frame_can_pose", 1, true);
 
   ros::spin();
 

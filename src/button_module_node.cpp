@@ -26,7 +26,6 @@ ros::Publisher box_pub ;
 void interfaceButtonActivationCallback(const dream_demos_setup::StampedBool::ConstPtr& redButton, 
   const dream_demos_setup::StampedBool::ConstPtr& greenButton, const dream_demos_setup::StampedBool::ConstPtr& yellowButton, 
   const dream_demos_setup::StampedBool::ConstPtr& squaredGreenButton){
-
   std_msgs::String msgToInterface;
   std_msgs::Bool msgToBox;
   if ((redButton->value) || (greenButton->value) || (yellowButton->value) || (squaredGreenButton->value)){
@@ -48,15 +47,16 @@ int main(int argc, char **argv)
   interface_pub = nh.advertise<std_msgs::String>("/interface", 1000);
   box_pub = nh.advertise<std_msgs::Bool>("/BoxModule", 1000);
 
+  std::cout<<"m init"<<std::endl;
 
-  message_filters::Subscriber<dream_demos_setup::StampedBool> redButton_sub(nh, "ButtonModule_Red", 1);
-  message_filters::Subscriber<dream_demos_setup::StampedBool> greenButton_sub(nh, "ButtonModule_Green", 1);
-  message_filters::Subscriber<dream_demos_setup::StampedBool> yellowButton_sub(nh, "ButtonModule_Yellow", 1);
-  message_filters::Subscriber<dream_demos_setup::StampedBool> squaredGreenButton_sub(nh, "ButtonModule_SquaredGreen", 1);
+  message_filters::Subscriber<dream_demos_setup::StampedBool> redButton_sub(nh, "/ButtonModule_Blue", 1);
+  message_filters::Subscriber<dream_demos_setup::StampedBool> greenButton_sub(nh, "/ButtonModule_Green", 1);
+  message_filters::Subscriber<dream_demos_setup::StampedBool> yellowButton_sub(nh, "/ButtonModule_Yellow", 1);
+  message_filters::Subscriber<dream_demos_setup::StampedBool> squaredGreenButton_sub(nh, "/ButtonModule_SquaredGreen", 1);
 
   typedef sync_policies::ApproximateTime<dream_demos_setup::StampedBool, dream_demos_setup::StampedBool, 
                                           dream_demos_setup::StampedBool, dream_demos_setup::StampedBool> MySyncPolicy;
-  Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), squaredGreenButton_sub,greenButton_sub);
+  Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), redButton_sub, yellowButton_sub, squaredGreenButton_sub,greenButton_sub);
   sync.registerCallback(boost::bind(&interfaceButtonActivationCallback, _1, _2, _3, _4));
 
   ros::spin();
