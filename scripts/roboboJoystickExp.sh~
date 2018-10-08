@@ -1,9 +1,0 @@
-#!/bin/bash
-xterm -e "sudo create_ap -n --no-virt wlan0 joystick_experiment joystickexp; $SHELL"& 
-sleep 15
-xterm -e "roscore" & 
-sleep 10 
-
-xterm -e "cd ~/modules_ws && . devel/setup.bash &&  rosrun dream_babbling_modules supervisor; $SHELL" & 
-xterm -e "cd ~/modules_ws && . devel/setup.bash && roslaunch mocap_optitrack mocap.launch; $SHELL" &
-xterm -e "cd ~/modules_ws && . devel/setup.bash && rosrun  dream_demos_setup optitrack_node; $SHELL"

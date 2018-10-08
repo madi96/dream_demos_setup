@@ -32,17 +32,18 @@ class ModuleDetection():
 	def locateAreaOfIntrest(self, hsvFrame, lowerBound, upperBound):
 		# Filter the area of intrest to get modules color tag 
 		threshInterface = cv2.inRange(hsvFrame,lowerBound, upperBound)
+		cv2.imshow("threshInterface"+str(lowerBound[0]),threshInterface)
 		#threshInterface2 = threshInterface.copy()
 
 		# Find modules in the filtered image
-		contours,_ = cv2.findContours(threshInterface, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+		_,contours,_ = cv2.findContours(threshInterface, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
 		# For each contour id the module depending on its relative position to the center of the interface
 		maxArea = 0
 		best_fit = None
 		if(len(contours) == 0) :
 			print("no contour detected")
-			sys.exit(1)
+			#sys.exit(1)
 
 		for cnt in contours:
 			area = cv2.contourArea(cnt)
@@ -50,9 +51,9 @@ class ModuleDetection():
 				maxArea = area
 				best_fit = cnt
 
-		if(not best_fit) :
-			print("no best fit contour")
-			sys.exit(1)
+		# if(not best_fit) :
+		# 	print("no best fit contour")
+		# 	sys.exit(1)
 		# Return coordinates and dimentions of the detected module
 
 		moduleCoodDim = cv2.boundingRect(best_fit)
@@ -62,6 +63,7 @@ class ModuleDetection():
 		return moduleCoodDim
 
 	def getButtonCurrentState(self, frame, hsvFrame):
+		# TO DO change to be general to all setup 
 		moduleName = "Button"
 		moduleState = ""
 		stateDico = {'name':moduleName,'state':moduleState}
@@ -79,13 +81,17 @@ class ModuleDetection():
 			# Retrieve module  from the original frame
 			button = frame[y:y+h,x:x+w] 
 			hsvButton = hsvFrame[y:y+h,x:x+w] 
+
 			# Specify color range for module detection
 			colorRangeLowerBound = np.array((50, 80, 80))
 			colorRangeUpperBound =  np.array((120, 255, 255))
 			# Get lever's position
 			xB,yB,wB,hB = self.locateAreaOfIntrest(hsvButton, colorRangeLowerBound, colorRangeUpperBound) 
+			# print xB+wB/2-w/2,yB+hB/2-h/2
 			# If a button is on, the center od the detected color will be relatively close to half of the width of the module
-			if ((xB+wB/2-w/2) < 2) & ((yB+hB/2-h/2) < 2):
+			# to be tuned according to he set up
+
+			if ((xB+wB/2-w/2) > -10) & ((yB+hB/2-h/2) > -10):
 				moduleState = 'ON'
 			else:
 				moduleState = 'OFF'  
@@ -209,7 +215,7 @@ class ModuleDetection():
 			thresh2 = thresh.copy()
 
 			# Find contours in the filtered image
-			contours,_ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+			_,contours,_ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
 			# Test for the contour with maximum area and store it as best fit for the interface
 			max_area = 0
@@ -223,9 +229,10 @@ class ModuleDetection():
 			cx, cy = 0,0    # coordinates of the center of the detected interface
 			x, y = 0,0      # coordinates of the detected interface
 			h,w = 0,0       # height and width of the detected interface
-			if isset('best_fit'):
-				M = cv2.moments(best_fit)
-				x,y,w,h = cv2.boundingRect(best_fit)
+
+			M = cv2.moments(best_fit)
+			x,y,w,h = cv2.boundingRect(best_fit)
+
 			if w == 0:
 				rospy.loginfo("WARNING: The Best fit for the Interface is no longer detected :( ...")
 			else:
@@ -264,6 +271,7 @@ class ModuleDetection():
 				buttonMsg = State()
 				buttonMsg.name = buttonInfo['name']
 				buttonMsg.state = buttonInfo['state']
+				print(buttonMsg)
 				pubButton.publish(buttonMsg)
 								
 				joystickMsg = Joystick()
@@ -280,7 +288,7 @@ class ModuleDetection():
 
 
 			# if 'Esc' is pressed then exit the loop
-			if cv2.waitKey(33)== 27:
+			if cv2.waitKey(33)== ord('q'):
 				break
 			
 		# Destroy all windows exit the program
